@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -11,6 +13,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
+import com.microsoft.tfs.client.common.ui.framework.helper.SWTUtil;
 import com.microsoft.tfs.core.clients.workitem.WorkItem;
 
 public class FieldHistoryView extends ViewPart {
@@ -24,6 +27,8 @@ public class FieldHistoryView extends ViewPart {
 	
 	@Override
 	public void createPartControl(Composite composite) {
+		SWTUtil.gridLayout(composite, 3, false, 5, 5);
+		
 		Label lblId = new Label(composite, SWT.LEFT);
 		lblId.setText("Work Item ID:");
 		txtWorkItemId = new Text(composite, SWT.SINGLE | SWT.BORDER);
@@ -45,7 +50,7 @@ public class FieldHistoryView extends ViewPart {
 		
 		grpWorkItem = new Group(composite, SWT.NONE);
 		grpWorkItem.setText("");
-		
+		grpWorkItem.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 0));
 		
 	}
 	
