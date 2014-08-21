@@ -6,6 +6,7 @@ Bundle-Version: 0.0.0.beta
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
- org.eclipse.ui.editors
+ org.eclipse.ui.editors,
+ com.microsoft.tfs.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: io.github.henriquesmoco.workitemfieldhistory.views

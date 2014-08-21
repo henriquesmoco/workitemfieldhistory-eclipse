@@ -4,16 +4,14 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
+
+import com.microsoft.tfs.core.clients.workitem.WorkItem;
 
 public class FieldHistoryView extends ViewPart {
 	public static final String ID = "io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView";
@@ -21,6 +19,8 @@ public class FieldHistoryView extends ViewPart {
 	private Text txtWorkItemId;
 	private Button btnShowRevisions;
 	private Group grpWorkItem;
+	
+	private TfsManager tfsManager;
 	
 	@Override
 	public void createPartControl(Composite composite) {
@@ -36,15 +36,27 @@ public class FieldHistoryView extends ViewPart {
 		
 		btnShowRevisions = new Button(composite, SWT.PUSH);
 		btnShowRevisions.setText("Show Revision(s)");
+		btnShowRevisions.setEnabled(false);
 		btnShowRevisions.addListener(SWT.Selection, evt -> {
-			String msg = "[Work Item not found]";
-			grpWorkItem.setText(msg);
+			long id = Long.parseLong(txtWorkItemId.getText());
+			WorkItem wi = tfsManager.getWorkItem(id);
+			updateView(wi);
 		});
 		
 		grpWorkItem = new Group(composite, SWT.NONE);
 		grpWorkItem.setText("");
 		
 		
+	}
+	
+	private void updateView(WorkItem wi) {
+		String wiTitle;
+		if (wi == null) {
+			wiTitle = "[Work Item not found]";
+		} else {
+			wiTitle = wi.getTitle();
+		}
+		grpWorkItem.setText(wiTitle);
 	}
 	
 	@Override
@@ -55,6 +67,10 @@ public class FieldHistoryView extends ViewPart {
 	//----------------------------
 	// Methods used for automation
 	//----------------------------
+	
+	public void setTfsManager(TfsManager manager) {
+		tfsManager = manager;
+	}
 	
 	public void setWorkItemId(String text) {
 		txtWorkItemId.setText(text);
