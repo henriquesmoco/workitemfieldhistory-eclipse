@@ -1,16 +1,24 @@
 package io.github.henriquesmoco.workitemfieldhistory.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView;
+import io.github.henriquesmoco.workitemfieldhistory.views.TfsManager;
 
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.microsoft.tfs.core.clients.workitem.WorkItem;
+
 public class FieldHistoryEditorTest {
 	
-	private FieldHistoryView view; 
+	private FieldHistoryView view;
+	private TfsManager manager;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -19,6 +27,8 @@ public class FieldHistoryEditorTest {
 	        .getActiveWorkbenchWindow()
 	        .getActivePage()
 	        .showView(FieldHistoryView.ID);
+		manager = mock(TfsManager.class);
+		view.setTfsManager(manager);
 	}
 
 	@After
@@ -55,5 +65,19 @@ public class FieldHistoryEditorTest {
 		view.showRevisionsClick();
 		assertEquals("[Work Item not found]", view.getWorkItemTitle());
 	}
+	
+	@Test
+	public void mostrarRevisoes_deWorkItemEncontrado_mostraTituloDoWorkItem() throws Exception {
+		String title = "Alguma Issue";
+		WorkItem wi = mock(WorkItem.class);
+		when(wi.getTitle()).thenReturn(title);
+		when(manager.getWorkItem(123)).thenReturn(wi);
+		
+		view.setWorkItemId("123");
+		view.showRevisionsClick();
+		
+		assertEquals(title, view.getWorkItemTitle());
+	}
+
 
 }
