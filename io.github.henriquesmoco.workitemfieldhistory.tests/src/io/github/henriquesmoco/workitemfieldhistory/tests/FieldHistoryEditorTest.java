@@ -1,6 +1,8 @@
 package io.github.henriquesmoco.workitemfieldhistory.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView;
 
 import org.eclipse.ui.PlatformUI;
@@ -38,7 +40,13 @@ public class FieldHistoryEditorTest {
 	}
 	
 	@Test
-	public void digitar_caracteresInvalidosNoCampoWorkItemId_desabilitaBotaoLoad() {
+	public void digitar_apenasNumerosNoCampoWorkItemId_habilitaShowRevisions() {
+		view.setWorkItemId("123");
+		assertTrue(view.isShowRevisionsEnabled());
+	}
+	
+	@Test
+	public void digitar_letrasNoCampoWorkItemId_desabilitaShowRevisions() {
 		view.setWorkItemId("abc");
 		assertFalse(view.isShowRevisionsEnabled());
 	}
