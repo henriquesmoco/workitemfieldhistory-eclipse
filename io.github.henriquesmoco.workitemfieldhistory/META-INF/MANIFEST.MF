@@ -8,6 +8,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  com.microsoft.tfs.core,
- com.microsoft.tfs.client.common.ui
+ com.microsoft.tfs.client.common.ui,
+ org.eclipse.nebula.widgets.grid;bundle-version="1.0.0",
+ com.microsoft.tfs.client.common
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: io.github.henriquesmoco.workitemfieldhistory.views
