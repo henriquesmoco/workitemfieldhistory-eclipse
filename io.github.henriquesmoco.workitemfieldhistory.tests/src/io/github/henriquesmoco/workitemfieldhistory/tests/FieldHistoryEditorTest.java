@@ -5,9 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
+import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
 import io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView;
-import io.github.henriquesmoco.workitemfieldhistory.views.TfsManager;
-import io.github.henriquesmoco.workitemfieldhistory.views.WorkItemDTO;
 
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
