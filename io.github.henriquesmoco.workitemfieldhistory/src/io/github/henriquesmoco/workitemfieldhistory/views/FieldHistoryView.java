@@ -105,33 +105,6 @@ public class FieldHistoryView extends ViewPart {
 		grpWorkItem.setText(wiTitle);
 	}
 	
-	private void updateGridWith(List<RevisionItem> revisions) {
-		Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(revisions);
-		
-		groupedRevisions.keySet().stream().sorted().forEachOrdered(key -> {
-			GridItem root = new GridItem(gridRevisions,SWT.NONE);
-		    root.setText(key);
-		    root.setColumnSpan(0, 4);
-		    
-		    for (RevisionItem revItem : groupedRevisions.get(key)) {
-		    	GridItem gridItem = new GridItem(root,SWT.NONE);
-				gridItem.setText(String.valueOf(revItem.rev));
-				gridItem.setText(1, revItem.revisedBy);
-				gridItem.setText(2, revItem.revisionDate.toString());
-				gridItem.setText(3, revItem.newValue);
-				gridItem.setText(4, revItem.oldValue);	
-			}
-		});
-	}
-	
-	private Map<String, List<RevisionItem>> groupByFieldName(List<RevisionItem> revs) {
-		Map<String, List<RevisionItem>> revsGrouped = 
-				revs.stream().collect(Collectors.groupingBy(
-						RevisionItem::getFieldName,               
-			            Collectors.toList()));
-		return revsGrouped;
-	}
-	
 	private List<RevisionItem> getRevisionsFrom(WorkItem wi) {
 		List<RevisionItem> lst = new ArrayList<>();
 		wi.getRevisions().forEach(item -> {
@@ -165,6 +138,33 @@ public class FieldHistoryView extends ViewPart {
 		Optional<Object> oldValue = Optional.ofNullable(field.getOriginalValue());
 		return field.shouldIgnoreForDeltaTable() || 
 				value.orElse("").equals(oldValue.orElse(""));
+	}
+	
+	private void updateGridWith(List<RevisionItem> revisions) {
+		Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(revisions);
+		
+		groupedRevisions.keySet().stream().sorted().forEachOrdered(key -> {
+			GridItem root = new GridItem(gridRevisions,SWT.NONE);
+		    root.setText(key);
+		    root.setColumnSpan(0, 4);
+		    
+		    for (RevisionItem revItem : groupedRevisions.get(key)) {
+		    	GridItem gridItem = new GridItem(root,SWT.NONE);
+				gridItem.setText(String.valueOf(revItem.rev));
+				gridItem.setText(1, revItem.revisedBy);
+				gridItem.setText(2, revItem.revisionDate.toString());
+				gridItem.setText(3, revItem.newValue);
+				gridItem.setText(4, revItem.oldValue);	
+			}
+		});
+	}
+	
+	private Map<String, List<RevisionItem>> groupByFieldName(List<RevisionItem> revs) {
+		Map<String, List<RevisionItem>> revsGrouped = 
+				revs.stream().collect(Collectors.groupingBy(
+						RevisionItem::getFieldName,               
+			            Collectors.toList()));
+		return revsGrouped;
 	}
 	
 	@Override
