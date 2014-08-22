@@ -5,10 +5,12 @@ import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
 import io.github.henriquesmoco.workitemfieldhistory.core.TfsManagerImpl;
 import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -16,9 +18,9 @@ import org.eclipse.nebula.widgets.grid.Grid;
 import org.eclipse.nebula.widgets.grid.GridColumn;
 import org.eclipse.nebula.widgets.grid.GridItem;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -34,6 +36,7 @@ public class FieldHistoryView extends ViewPart {
 	private Text txtWorkItemId;
 	private Button btnShowRevisions;
 	private Group grpWorkItem;
+	private Combo cboFilter;
 	private Grid gridRevisions;
 	
 	private TfsManager tfsManager = new TfsManagerImpl();
@@ -42,8 +45,8 @@ public class FieldHistoryView extends ViewPart {
 	public void createPartControl(Composite composite) {
 		SWTUtil.gridLayout(composite, 3, false, 5, 5);		
 		createTextWorItemIdIn(composite);
-		createButtonShowRevisionsIn(composite);		
-		createGridRevisionsIn(composite);
+		createButtonShowRevisionsIn(composite);
+		createGroupWorkItemIn(composite);
 	}
 	
 	private void createTextWorItemIdIn(Composite composite) {
@@ -68,15 +71,27 @@ public class FieldHistoryView extends ViewPart {
 			updateView(wi);
 		});		
 	}
-
-	private void createGridRevisionsIn(Composite composite) {
+	
+	private void createGroupWorkItemIn(Composite composite) {
 		grpWorkItem = new Group(composite, SWT.NONE);
 		grpWorkItem.setText("");
 		grpWorkItem.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 0));
-		grpWorkItem.setLayout(new FillLayout());
+		SWTUtil.gridLayout(grpWorkItem, 2, false, 5, 5);
 		
-		gridRevisions = new Grid(grpWorkItem,SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		gridRevisions.setHeaderVisible(true);		
+		createGridFilterIn(grpWorkItem);
+		createGridRevisionsIn(grpWorkItem);
+	}
+	
+	private void createGridFilterIn(Composite composite) {
+		Label lblId = new Label(composite, SWT.LEFT);
+		lblId.setText("Filter By:");		
+		cboFilter = new Combo(composite, SWT.DROP_DOWN);
+	}
+
+	private void createGridRevisionsIn(Composite composite) {
+		gridRevisions = new Grid(composite,SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		gridRevisions.setHeaderVisible(true);
+		gridRevisions.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 0));
 		createGridColumn("Rev", 100).setTree(true);
 	    createGridColumn("Revised By", 100);
 	    createGridColumn("Revision Date", 100);
@@ -92,25 +107,30 @@ public class FieldHistoryView extends ViewPart {
 	}
 	
 	private void updateView(WorkItemDTO wi) {
+		cboFilter.removeAll();
 		gridRevisions.clearItems();
 		String wiTitle = "[Work Item not found]";
 		if (wi != null) {
 			wiTitle = wi.getTitle();
-			updateGridWith(wi.getRevisions());
+			Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(wi.getRevisions());
+			updateComboFiltersWith(groupedRevisions.keySet());
+			updateGridWith(groupedRevisions);
 		}
 		grpWorkItem.setText(wiTitle);
 	}
+	
+	private void updateComboFiltersWith(Set<String> fieldNames) {
+		cboFilter.setItems(fieldNames.stream().sorted().toArray(String[]::new));
+		cboFilter.add("All Fields", 0);
+	}
 
-	private void updateGridWith(List<RevisionItem> revisions) {
-		if (revisions == null) return;
-		Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(revisions);
-		
-		groupedRevisions.keySet().stream().sorted().forEachOrdered(key -> {
+	private void updateGridWith(Map<String, List<RevisionItem>> revisions) {
+		revisions.keySet().stream().sorted().forEachOrdered(key -> {
 			GridItem root = new GridItem(gridRevisions, SWT.NONE);
 		    root.setText(key);
 		    root.setColumnSpan(0, 4);
 		    
-		    for (RevisionItem revItem : groupedRevisions.get(key)) {
+		    for (RevisionItem revItem : revisions.get(key)) {
 		    	GridItem gridItem = new GridItem(root, SWT.NONE);
 				gridItem.setText(String.valueOf(revItem.rev));
 				gridItem.setText(1, revItem.revisedBy);
@@ -122,6 +142,9 @@ public class FieldHistoryView extends ViewPart {
 	}
 	
 	private Map<String, List<RevisionItem>> groupByFieldName(List<RevisionItem> revs) {
+		if (revs == null) {
+			revs = new ArrayList<RevisionItem>();
+		}		
 		Map<String, List<RevisionItem>> revsGrouped = 
 				revs.stream().collect(Collectors.groupingBy(
 						RevisionItem::getFieldName,               
@@ -164,6 +187,10 @@ public class FieldHistoryView extends ViewPart {
 
 	public List<GridItem> getGridItems() {
 		return Arrays.asList(gridRevisions.getItems());
+	}
+
+	public String[] getFilters() {
+		return cboFilter.getItems();
 	}
 
 }
