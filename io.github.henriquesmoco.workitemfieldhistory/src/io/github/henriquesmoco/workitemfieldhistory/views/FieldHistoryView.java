@@ -92,15 +92,14 @@ public class FieldHistoryView extends ViewPart {
 	}
 	
 	private void updateView(WorkItemDTO wi) {
-		String wiTitle;
-		if (wi == null) {
-			wiTitle = "[Work Item not found]";
-		} else {
+		gridRevisions.clearItems();
+		String wiTitle = "[Work Item not found]";
+		if (wi != null) {
 			wiTitle = wi.getTitle();
 			updateGridWith(wi.getRevisions());
 		}
 		grpWorkItem.setText(wiTitle);
-	}	
+	}
 
 	private void updateGridWith(List<RevisionItem> revisions) {
 		if (revisions == null) return;
