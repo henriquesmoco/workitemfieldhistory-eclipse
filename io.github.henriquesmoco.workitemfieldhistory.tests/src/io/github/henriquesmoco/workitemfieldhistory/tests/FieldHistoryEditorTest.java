@@ -7,13 +7,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView;
 import io.github.henriquesmoco.workitemfieldhistory.views.TfsManager;
+import io.github.henriquesmoco.workitemfieldhistory.views.WorkItemDTO;
 
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.microsoft.tfs.core.clients.workitem.WorkItem;
 
 public class FieldHistoryEditorTest {
 	
@@ -69,8 +68,8 @@ public class FieldHistoryEditorTest {
 	@Test
 	public void mostrarRevisoes_deWorkItemEncontrado_mostraTituloDoWorkItem() throws Exception {
 		String title = "Alguma Issue";
-		WorkItem wi = mock(WorkItem.class);
-		when(wi.getTitle()).thenReturn(title);
+		WorkItemDTO wi = new WorkItemDTO();
+		wi.setTitle(title);
 		when(manager.getWorkItem(123)).thenReturn(wi);
 		
 		view.setWorkItemId("123");
@@ -78,6 +77,5 @@ public class FieldHistoryEditorTest {
 		
 		assertEquals(title, view.getWorkItemTitle());
 	}
-
 
 }
