@@ -8,5 +8,13 @@ public class RevisionItem {
 	public LocalDateTime revisionDate;
 	public String newValue;
 	public String oldValue;
-	public String fieldName;
+	private String fieldName;
+	
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
 }

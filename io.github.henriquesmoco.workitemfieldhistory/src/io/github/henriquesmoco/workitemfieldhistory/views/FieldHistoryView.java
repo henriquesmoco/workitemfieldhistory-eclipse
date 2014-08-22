@@ -5,21 +5,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
-
-
-
-
-
-
-
-
+import java.util.stream.Collectors;
 
 import org.eclipse.nebula.widgets.grid.Grid;
 import org.eclipse.nebula.widgets.grid.GridColumn;
@@ -27,7 +17,6 @@ import org.eclipse.nebula.widgets.grid.GridItem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -35,16 +24,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
-
-
-
-
-
-
-
-
 import com.microsoft.tfs.client.common.ui.framework.helper.SWTUtil;
-import com.microsoft.tfs.core.clients.workitem.WorkItem;import com.microsoft.tfs.core.clients.workitem.revision.RevisionField;
+import com.microsoft.tfs.core.clients.workitem.WorkItem;
+import com.microsoft.tfs.core.clients.workitem.revision.RevisionField;
+
 
 
 public class FieldHistoryView extends ViewPart {
@@ -116,30 +99,37 @@ public class FieldHistoryView extends ViewPart {
 			wiTitle = "[Work Item not found]";
 		} else {
 			wiTitle = wi.getTitle();
-			updateGridRevisons(wi);
+			List<RevisionItem> revisions = getRevisionsFrom(wi);
+			updateGridWith(revisions);
 		}
 		grpWorkItem.setText(wiTitle);
 	}
 	
-	private void updateGridRevisons(WorkItem wi) {
-		Map<String, GridItem> mapRoots = new TreeMap<>();
-		List<RevisionItem> lst = getRevisionsFrom(wi);
+	private void updateGridWith(List<RevisionItem> revisions) {
+		Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(revisions);
 		
-		for (RevisionItem revItem : lst) {
-			GridItem root = mapRoots.get(revItem.fieldName);
-			if (root == null) {
-				root = new GridItem(gridRevisions,SWT.NONE);
-			    root.setText(revItem.fieldName);
-			    root.setColumnSpan(0, 4);
-			    mapRoots.put(revItem.fieldName, root);
+		groupedRevisions.keySet().stream().sorted().forEachOrdered(key -> {
+			GridItem root = new GridItem(gridRevisions,SWT.NONE);
+		    root.setText(key);
+		    root.setColumnSpan(0, 4);
+		    
+		    for (RevisionItem revItem : groupedRevisions.get(key)) {
+		    	GridItem gridItem = new GridItem(root,SWT.NONE);
+				gridItem.setText(String.valueOf(revItem.rev));
+				gridItem.setText(1, revItem.revisedBy);
+				gridItem.setText(2, revItem.revisionDate.toString());
+				gridItem.setText(3, revItem.newValue);
+				gridItem.setText(4, revItem.oldValue);	
 			}
-			GridItem gridItem = new GridItem(root,SWT.NONE);
-			gridItem.setText(String.valueOf(revItem.rev));
-			gridItem.setText(1, revItem.revisedBy);
-			gridItem.setText(2, revItem.revisionDate.toString());
-			gridItem.setText(3, revItem.newValue);
-			gridItem.setText(4, revItem.oldValue);
-		}
+		});
+	}
+	
+	private Map<String, List<RevisionItem>> groupByFieldName(List<RevisionItem> revs) {
+		Map<String, List<RevisionItem>> revsGrouped = 
+				revs.stream().collect(Collectors.groupingBy(
+						RevisionItem::getFieldName,               
+			            Collectors.toList()));
+		return revsGrouped;
 	}
 	
 	private List<RevisionItem> getRevisionsFrom(WorkItem wi) {
@@ -155,9 +145,9 @@ public class FieldHistoryView extends ViewPart {
 				revItem.rev = rev;
 				revItem.revisedBy = changedBy;
 				revItem.revisionDate = revDate;
-				revItem.fieldName = field.getName();
 				revItem.newValue = field.getValue() == null ? "" : field.getValue().toString();
 				revItem.oldValue = field.getOriginalValue() == null ? "" : field.getOriginalValue().toString();
+				revItem.setFieldName(field.getName());
 				lst.add(revItem);
 			};
 		});
