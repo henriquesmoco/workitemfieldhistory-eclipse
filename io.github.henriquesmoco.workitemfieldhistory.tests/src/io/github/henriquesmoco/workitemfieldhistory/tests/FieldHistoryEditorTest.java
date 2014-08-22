@@ -114,6 +114,22 @@ public class FieldHistoryEditorTest {
 		assertEquals(rootField2, gridItems.get(4).getParentItem());
 	}
 	
+	@Test
+	public void mostrarRevisoes_deWorkItemComRevisoes_AtualizaFiltroComCamposAlterados() throws Exception {
+		WorkItemDTO wi = newWorkItem();
+		wi.setRevisions(Arrays.asList(
+				newRevision("field1", 1, "new1", "old1"),
+				newRevision("field2", 1, "new2", "old2")
+				));
+		when(manager.getWorkItem(anyInt())).thenReturn(wi);
+		
+		view.setWorkItemId("123");
+		view.showRevisionsClick();
+		
+		String[] expected = new String[] { "All Fields", "field1", "field2" };
+		assertArrayEquals(expected, view.getFilters());	
+	}
+	
 	private WorkItemDTO newWorkItem() {
 		WorkItemDTO wi = new WorkItemDTO();
 		wi.setTitle("Alguma Issue");
