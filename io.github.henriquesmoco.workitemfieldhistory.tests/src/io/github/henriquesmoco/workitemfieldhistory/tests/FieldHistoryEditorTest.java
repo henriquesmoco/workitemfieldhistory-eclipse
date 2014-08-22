@@ -1,14 +1,21 @@
 package io.github.henriquesmoco.workitemfieldhistory.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyInt;
+
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.Arrays;
+import java.util.List;
+
+import io.github.henriquesmoco.workitemfieldhistory.core.RevisionItem;
 import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
 import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
 import io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView;
 
+import org.eclipse.nebula.widgets.grid.GridItem;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
@@ -67,15 +74,60 @@ public class FieldHistoryEditorTest {
 	
 	@Test
 	public void mostrarRevisoes_deWorkItemEncontrado_mostraTituloDoWorkItem() throws Exception {
-		String title = "Alguma Issue";
-		WorkItemDTO wi = new WorkItemDTO();
-		wi.setTitle(title);
+		WorkItemDTO wi = newWorkItem();
 		when(manager.getWorkItem(123)).thenReturn(wi);
 		
 		view.setWorkItemId("123");
 		view.showRevisionsClick();
 		
-		assertEquals(title, view.getWorkItemTitle());
+		assertEquals(wi.getTitle(), view.getWorkItemTitle());
 	}
 
+	@Test
+	public void mostrarRevisoes_deWorkItemSemRevisoes_deixaGridVazio() throws Exception {
+		when(manager.getWorkItem(anyInt())).thenReturn(newWorkItem());
+		
+		view.setWorkItemId("123");
+		view.showRevisionsClick();
+		
+		assertTrue(view.getGridItems().isEmpty());
+	}
+	
+	@Test
+	public void mostrarRevisoes_deWorkItemComRevisoes_populaGridAgrupandoPorCampos() throws Exception {
+		WorkItemDTO wi = newWorkItem();
+		wi.setRevisions(Arrays.asList(
+				newRevision("field1", 1, "new1", "old1"),
+				newRevision("field2", 1, "new2", "old2"),
+				newRevision("field2", 2, "new3", "old3")
+				));
+		when(manager.getWorkItem(anyInt())).thenReturn(wi);
+		
+		view.setWorkItemId("123");
+		view.showRevisionsClick();
+		
+		List<GridItem> gridItems = view.getGridItems();
+		GridItem rootField1 = gridItems.get(0);
+		assertEquals(rootField1, gridItems.get(1).getParentItem());		
+		GridItem rootField2 = gridItems.get(2);
+		assertEquals(rootField2, gridItems.get(3).getParentItem());
+		assertEquals(rootField2, gridItems.get(4).getParentItem());
+	}
+	
+	private WorkItemDTO newWorkItem() {
+		WorkItemDTO wi = new WorkItemDTO();
+		wi.setTitle("Alguma Issue");
+		return wi;
+	}
+	
+	private RevisionItem newRevision(String fieldName, int rev, String newValue, String oldValue) {
+		RevisionItem revItem = new RevisionItem();
+		revItem.rev = rev;
+		revItem.revisedBy = "Developer";
+		revItem.revisionDate = LocalDateTime.of(2014, Month.AUGUST, 8, 3, 0);
+		revItem.newValue = newValue;
+		revItem.oldValue = oldValue;
+		revItem.setFieldName(fieldName);
+		return revItem;
+	}
 }
