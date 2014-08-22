@@ -1,4 +1,4 @@
-package io.github.henriquesmoco.workitemfieldhistory.views;
+package io.github.henriquesmoco.workitemfieldhistory.core;
 
 import com.microsoft.tfs.client.common.server.TFSServer;
 import com.microsoft.tfs.client.common.ui.TFSCommonUIClientPlugin;

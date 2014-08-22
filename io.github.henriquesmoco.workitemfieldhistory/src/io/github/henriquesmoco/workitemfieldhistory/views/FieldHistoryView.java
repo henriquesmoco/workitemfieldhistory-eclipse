@@ -1,5 +1,10 @@
 package io.github.henriquesmoco.workitemfieldhistory.views;
 
+import io.github.henriquesmoco.workitemfieldhistory.core.RevisionItem;
+import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
+import io.github.henriquesmoco.workitemfieldhistory.core.TfsManagerImpl;
+import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package io.github.henriquesmoco.workitemfieldhistory.views;
+package io.github.henriquesmoco.workitemfieldhistory.core;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
