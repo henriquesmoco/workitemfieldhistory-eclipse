@@ -95,13 +95,7 @@ public class FieldHistoryEditorTest {
 	
 	@Test
 	public void mostrarRevisoes_deWorkItemComRevisoes_populaGridAgrupandoPorCampos() throws Exception {
-		WorkItemDTO wi = newWorkItem();
-		wi.setRevisions(Arrays.asList(
-				newRevision("field1", 1, "new1", "old1"),
-				newRevision("field2", 1, "new2", "old2"),
-				newRevision("field2", 2, "new3", "old3")
-				));
-		when(manager.getWorkItem(anyInt())).thenReturn(wi);
+		when(manager.getWorkItem(anyInt())).thenReturn(newWorkItemWithRevisions());
 		
 		view.setWorkItemId("123");
 		view.showRevisionsClick();
@@ -116,12 +110,7 @@ public class FieldHistoryEditorTest {
 	
 	@Test
 	public void mostrarRevisoes_deWorkItemComRevisoes_AtualizaFiltroComCamposAlterados() throws Exception {
-		WorkItemDTO wi = newWorkItem();
-		wi.setRevisions(Arrays.asList(
-				newRevision("field1", 1, "new1", "old1"),
-				newRevision("field2", 1, "new2", "old2")
-				));
-		when(manager.getWorkItem(anyInt())).thenReturn(wi);
+		when(manager.getWorkItem(anyInt())).thenReturn(newWorkItemWithRevisions());
 		
 		view.setWorkItemId("123");
 		view.showRevisionsClick();
@@ -130,6 +119,42 @@ public class FieldHistoryEditorTest {
 		assertArrayEquals(expected, view.getFilters());	
 	}
 	
+	@Test
+	public void filtrarGrid_porTodosOsCampos_mostraTodosCampos() throws Exception {
+		when(manager.getWorkItem(anyInt())).thenReturn(newWorkItemWithRevisions());
+		
+		view.setWorkItemId("123");
+		view.showRevisionsClick();
+		view.selectFilter("All Fields");
+		
+		assertEquals(5, view.getGridItems().size());
+	}
+	
+	@Test
+	public void filtrarGrid_porUmCampoEspecifico_soMostraRevisoesDesteCampo() throws Exception {
+		when(manager.getWorkItem(anyInt())).thenReturn(newWorkItemWithRevisions());
+		
+		view.setWorkItemId("123");
+		view.showRevisionsClick();
+		view.selectFilter("field2");
+		
+		List<GridItem> gridItems = view.getGridItems();
+		GridItem rootField = gridItems.get(0);
+		assertEquals(3, gridItems.size());
+		assertEquals("field2", rootField.getText());
+		assertEquals(rootField, gridItems.get(1).getParentItem());
+		assertEquals(rootField, gridItems.get(2).getParentItem());
+	}
+	
+	private WorkItemDTO newWorkItemWithRevisions() {
+		WorkItemDTO wi = newWorkItem();
+		wi.setRevisions(Arrays.asList(
+				newRevision("field1", 1, "new1", "old1"),
+				newRevision("field2", 1, "new2", "old2"),
+				newRevision("field2", 2, "new3", "old3")
+				));
+		return wi;
+	}
 	private WorkItemDTO newWorkItem() {
 		WorkItemDTO wi = new WorkItemDTO();
 		wi.setTitle("Alguma Issue");
