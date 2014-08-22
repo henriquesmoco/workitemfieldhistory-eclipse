@@ -5,6 +5,7 @@ import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
 import io.github.henriquesmoco.workitemfieldhistory.core.TfsManagerImpl;
 import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -102,6 +103,7 @@ public class FieldHistoryView extends ViewPart {
 	}	
 
 	private void updateGridWith(List<RevisionItem> revisions) {
+		if (revisions == null) return;
 		Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(revisions);
 		
 		groupedRevisions.keySet().stream().sorted().forEachOrdered(key -> {
@@ -159,6 +161,10 @@ public class FieldHistoryView extends ViewPart {
 
 	public String getWorkItemTitle() {
 		return grpWorkItem.getText();
+	}
+
+	public List<GridItem> getGridItems() {
+		return Arrays.asList(gridRevisions.getItems());
 	}
 
 }
