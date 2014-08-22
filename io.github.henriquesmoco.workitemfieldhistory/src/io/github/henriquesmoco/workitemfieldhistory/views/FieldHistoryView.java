@@ -7,6 +7,7 @@ import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +39,8 @@ public class FieldHistoryView extends ViewPart {
 	private Group grpWorkItem;
 	private Combo cboFilter;
 	private Grid gridRevisions;
+	
+	private Map<String, List<RevisionItem>> groupedRevisions;
 	
 	private TfsManager tfsManager = new TfsManagerImpl();
 	
@@ -86,6 +89,16 @@ public class FieldHistoryView extends ViewPart {
 		Label lblId = new Label(composite, SWT.LEFT);
 		lblId.setText("Filter By:");		
 		cboFilter = new Combo(composite, SWT.DROP_DOWN);
+		cboFilter.addListener(SWT.Selection, evt -> {
+			if (cboFilter.getSelectionIndex() < 1) {
+				updateGridWith(groupedRevisions);
+				return;
+			}
+			String key = cboFilter.getItem(cboFilter.getSelectionIndex());
+			Map<String, List<RevisionItem>> filteredRevisions = new HashMap<>();
+			filteredRevisions.put(key, groupedRevisions.get(key));
+			updateGridWith(filteredRevisions);
+		});
 	}
 
 	private void createGridRevisionsIn(Composite composite) {
@@ -112,7 +125,7 @@ public class FieldHistoryView extends ViewPart {
 		String wiTitle = "[Work Item not found]";
 		if (wi != null) {
 			wiTitle = wi.getTitle();
-			Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(wi.getRevisions());
+			groupedRevisions = groupByFieldName(wi.getRevisions());
 			updateComboFiltersWith(groupedRevisions.keySet());
 			updateGridWith(groupedRevisions);
 		}
@@ -125,6 +138,7 @@ public class FieldHistoryView extends ViewPart {
 	}
 
 	private void updateGridWith(Map<String, List<RevisionItem>> revisions) {
+		gridRevisions.clearItems();
 		revisions.keySet().stream().sorted().forEachOrdered(key -> {
 			GridItem root = new GridItem(gridRevisions, SWT.NONE);
 		    root.setText(key);
@@ -191,6 +205,11 @@ public class FieldHistoryView extends ViewPart {
 
 	public String[] getFilters() {
 		return cboFilter.getItems();
+	}
+
+	public void selectFilter(String fieldName) {
+		cboFilter.select(cboFilter.indexOf(fieldName));
+		cboFilter.notifyListeners(SWT.Selection, null);
 	}
 
 }
