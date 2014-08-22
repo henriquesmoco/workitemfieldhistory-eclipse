@@ -7,6 +7,7 @@ import com.microsoft.tfs.core.clients.workitem.WorkItem;
 public class TfsManagerImpl implements TfsManager {
 	
 	private TFSServer server;
+	private WorkItemTransform wiTransform = new WorkItemTransform();
 	
 	private TFSServer getDefaultServer() {
 		TFSServer defaultServer = TFSCommonUIClientPlugin.getDefault()
@@ -24,12 +25,12 @@ public class TfsManagerImpl implements TfsManager {
 	}
 
 	@Override
-	public WorkItem getWorkItem(long id) {
+	public WorkItemDTO getWorkItem(long id) {
 		WorkItem wi = getDefaultServer()
 				.getConnection()
 				.getWorkItemClient()
 				.getWorkItemByID((int) id);
 		
-		return wi;
+		return wiTransform.toDTO(wi);
 	}
 }

@@ -1,10 +1,5 @@
 package io.github.henriquesmoco.workitemfieldhistory.views;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,9 +20,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
 import com.microsoft.tfs.client.common.ui.framework.helper.SWTUtil;
-import com.microsoft.tfs.core.clients.workitem.WorkItem;
-import com.microsoft.tfs.core.clients.workitem.revision.RevisionField;
-
 
 
 public class FieldHistoryView extends ViewPart {
@@ -66,7 +58,7 @@ public class FieldHistoryView extends ViewPart {
 		btnShowRevisions.setEnabled(false);
 		btnShowRevisions.addListener(SWT.Selection, evt -> {
 			long id = Long.parseLong(txtWorkItemId.getText());
-			WorkItem wi = tfsManager.getWorkItem(id);
+			WorkItemDTO wi = tfsManager.getWorkItem(id);
 			updateView(wi);
 		});		
 	}
@@ -93,63 +85,27 @@ public class FieldHistoryView extends ViewPart {
 	    return col;
 	}
 	
-	private void updateView(WorkItem wi) {
+	private void updateView(WorkItemDTO wi) {
 		String wiTitle;
 		if (wi == null) {
 			wiTitle = "[Work Item not found]";
 		} else {
 			wiTitle = wi.getTitle();
-			List<RevisionItem> revisions = getRevisionsFrom(wi);
-			updateGridWith(revisions);
+			updateGridWith(wi.getRevisions());
 		}
 		grpWorkItem.setText(wiTitle);
-	}
-	
-	private List<RevisionItem> getRevisionsFrom(WorkItem wi) {
-		List<RevisionItem> lst = new ArrayList<>();
-		wi.getRevisions().forEach(item -> {
-			int rev = (Integer) item.getField("System.Rev").getValue();
-			String changedBy = (String) item.getField("System.ChangedBy").getValue();
-			LocalDateTime revDate = toLocalDateTime(item.getRevisionDate());
-			for (RevisionField field : item.getFields()) {
-				if (shouldIgnore(field)) continue;
-				
-				RevisionItem revItem = new RevisionItem();
-				revItem.rev = rev;
-				revItem.revisedBy = changedBy;
-				revItem.revisionDate = revDate;
-				revItem.newValue = field.getValue() == null ? "" : field.getValue().toString();
-				revItem.oldValue = field.getOriginalValue() == null ? "" : field.getOriginalValue().toString();
-				revItem.setFieldName(field.getName());
-				lst.add(revItem);
-			};
-		});
-		return lst;
-	}
-	
-	private LocalDateTime toLocalDateTime(Date date) {
-		Instant instant = Instant.ofEpochMilli(date.getTime());
-		LocalDateTime localDt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-		return localDt;
-	}
-	
-	private boolean shouldIgnore(RevisionField field) {
-		Optional<Object> value = Optional.ofNullable(field.getValue());
-		Optional<Object> oldValue = Optional.ofNullable(field.getOriginalValue());
-		return field.shouldIgnoreForDeltaTable() || 
-				value.orElse("").equals(oldValue.orElse(""));
-	}
-	
+	}	
+
 	private void updateGridWith(List<RevisionItem> revisions) {
 		Map<String, List<RevisionItem>> groupedRevisions = groupByFieldName(revisions);
 		
 		groupedRevisions.keySet().stream().sorted().forEachOrdered(key -> {
-			GridItem root = new GridItem(gridRevisions,SWT.NONE);
+			GridItem root = new GridItem(gridRevisions, SWT.NONE);
 		    root.setText(key);
 		    root.setColumnSpan(0, 4);
 		    
 		    for (RevisionItem revItem : groupedRevisions.get(key)) {
-		    	GridItem gridItem = new GridItem(root,SWT.NONE);
+		    	GridItem gridItem = new GridItem(root, SWT.NONE);
 				gridItem.setText(String.valueOf(revItem.rev));
 				gridItem.setText(1, revItem.revisedBy);
 				gridItem.setText(2, revItem.revisionDate.toString());
