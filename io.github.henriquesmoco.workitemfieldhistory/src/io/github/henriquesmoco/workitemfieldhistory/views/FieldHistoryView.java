@@ -171,6 +171,12 @@ public class FieldHistoryView extends ViewPart {
 		txtWorkItemId.setFocus();		
 	}
 	
+	@Override
+	public void dispose() {
+		tfsManager.dispose();
+		super.dispose();
+	}
+	
 	//----------------------------
 	// Methods used for automation
 	//----------------------------
