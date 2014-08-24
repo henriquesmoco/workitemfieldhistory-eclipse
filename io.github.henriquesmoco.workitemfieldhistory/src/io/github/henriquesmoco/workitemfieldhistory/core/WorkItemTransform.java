@@ -18,6 +18,7 @@ public class WorkItemTransform {
 		
 		WorkItemDTO dto = new WorkItemDTO();
 		dto.setId(wi.getID());
+		dto.setTypeName(wi.getType().getName());
 		dto.setTitle(wi.getTitle());
 		dto.setRevisions(getRevisionsFrom(wi));
 		return dto;
