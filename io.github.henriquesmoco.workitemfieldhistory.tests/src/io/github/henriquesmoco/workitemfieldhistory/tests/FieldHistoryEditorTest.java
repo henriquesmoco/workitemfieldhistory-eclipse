@@ -88,7 +88,7 @@ public class FieldHistoryEditorTest {
 		view.setWorkItemId("123");
 		view.showRevisionsClick();
 		
-		assertEquals(wi.getTitle(), view.getWorkItemTitle());
+		assertEquals(wi.getDisplayTitle(), view.getWorkItemTitle());
 	}
 
 	@Test
@@ -173,6 +173,7 @@ public class FieldHistoryEditorTest {
 	private WorkItemDTO newWorkItem() {
 		WorkItemDTO wi = new WorkItemDTO();
 		wi.setTitle("Alguma Issue");
+		wi.setTypeName("Bug");
 		return wi;
 	}
 	
