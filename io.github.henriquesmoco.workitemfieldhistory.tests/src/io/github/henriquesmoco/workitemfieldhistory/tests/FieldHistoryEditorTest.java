@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -20,6 +22,7 @@ import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.internal.verification.AtLeast;
 
 public class FieldHistoryEditorTest {
 	
@@ -39,11 +42,15 @@ public class FieldHistoryEditorTest {
 
 	@After
 	public void tearDown() throws Exception {
+		close(view);
+	}
+
+	private void close(FieldHistoryView view) {
 		PlatformUI
         .getWorkbench()
         .getActiveWorkbenchWindow()
         .getActivePage()
-        .hideView(view);
+        .hideView(view);		
 	}
 
 	@Test
@@ -144,6 +151,13 @@ public class FieldHistoryEditorTest {
 		assertEquals("field2", rootField.getText());
 		assertEquals(rootField, gridItems.get(1).getParentItem());
 		assertEquals(rootField, gridItems.get(2).getParentItem());
+	}
+	
+	@Test
+	public void fecharView_independenteDeConexaoComTfs_deveChamarDisposeNoTfsManager() throws Exception {
+		close(view);
+		
+		verify(manager, atLeastOnce()).dispose();
 	}
 	
 	private WorkItemDTO newWorkItemWithRevisions() {
