@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: WorkItem Field History
 Bundle-SymbolicName: io.github.henriquesmoco.workitemfieldhistory;singleton:=true
-Bundle-Version: 0.0.0.beta
+Bundle-Version: 0.7.0.alpha
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  com.microsoft.tfs.core,
