@@ -37,6 +37,7 @@ public class FieldHistoryView extends ViewPart {
 	public static final String ID = "io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView";
 	private static final Pattern ONLY_DIGITS = Pattern.compile("\\d+");
 	private Text txtWorkItemId;
+	private Button btnChooseWorkItem;
 	private Button btnShowRevisions;
 	private Group grpWorkItem;
 	private Combo cboFilter;
@@ -48,8 +49,9 @@ public class FieldHistoryView extends ViewPart {
 	
 	@Override
 	public void createPartControl(Composite composite) {
-		SWTUtil.gridLayout(composite, 3, false, 5, 5);		
+		SWTUtil.gridLayout(composite, 4, false, 5, 5);		
 		createTextWorItemIdIn(composite);
+		createButtonChooseWorkItemIn(composite);
 		createButtonShowRevisionsIn(composite);
 		createGroupWorkItemIn(composite);
 	}
@@ -66,6 +68,19 @@ public class FieldHistoryView extends ViewPart {
 		});	
 	}
 
+	private void createButtonChooseWorkItemIn(Composite composite) {
+		btnChooseWorkItem = new Button(composite, SWT.PUSH);
+		btnChooseWorkItem.setText("...");
+		btnChooseWorkItem.setToolTipText("Choose Work Item...");
+		btnChooseWorkItem.setEnabled(true);
+		btnChooseWorkItem.addListener(SWT.Selection, evt -> {
+			BusyIndicator.showWhile(Display.getDefault(), () -> {
+				WorkItemDTO wi = tfsManager.chooseWorkItemDialog();
+				updateView(wi);
+			});
+		});
+	}
+	
 	private void createButtonShowRevisionsIn(Composite composite) {
 		btnShowRevisions = new Button(composite, SWT.PUSH);
 		btnShowRevisions.setText("Show Revision(s)");
@@ -82,7 +97,7 @@ public class FieldHistoryView extends ViewPart {
 	private void createGroupWorkItemIn(Composite composite) {
 		grpWorkItem = new Group(composite, SWT.NONE);
 		grpWorkItem.setText("");
-		grpWorkItem.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 0));
+		grpWorkItem.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 0));
 		SWTUtil.gridLayout(grpWorkItem, 2, false, 5, 5);
 		
 		createGridFilterIn(grpWorkItem);
@@ -128,7 +143,8 @@ public class FieldHistoryView extends ViewPart {
 		gridRevisions.clearItems();
 		String wiTitle = "[Work Item not found]";
 		if (wi != null) {
-			wiTitle = wi.getTitle();
+			wiTitle = wi.getDisplayTitle();
+			txtWorkItemId.setText(String.valueOf(wi.getId()));
 			groupedRevisions = groupByFieldName(wi.getRevisions());
 			updateComboFiltersWith(groupedRevisions.keySet());
 			updateGridWith(groupedRevisions);

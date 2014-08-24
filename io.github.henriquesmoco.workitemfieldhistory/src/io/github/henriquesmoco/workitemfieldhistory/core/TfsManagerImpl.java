@@ -1,12 +1,19 @@
 package io.github.henriquesmoco.workitemfieldhistory.core;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
 import com.microsoft.tfs.client.common.server.ServerManagerAdapter;
 import com.microsoft.tfs.client.common.server.ServerManagerEvent;
 import com.microsoft.tfs.client.common.server.ServerManagerListener;
 import com.microsoft.tfs.client.common.server.TFSServer;
 import com.microsoft.tfs.client.common.ui.TFSCommonUIClientPlugin;
+import com.microsoft.tfs.client.common.ui.framework.dialog.BaseDialog;
 import com.microsoft.tfs.client.common.ui.framework.helper.UIHelpers;
+import com.microsoft.tfs.client.common.ui.wit.dialogs.WorkItemPickerDialog;
 import com.microsoft.tfs.core.clients.workitem.WorkItem;
+import com.microsoft.tfs.core.clients.workitem.WorkItemClient;
+import com.microsoft.tfs.core.clients.workitem.project.Project;
 
 public class TfsManagerImpl implements TfsManager {	
 	private TFSServer server;
@@ -19,6 +26,26 @@ public class TfsManagerImpl implements TfsManager {
 				.getServerManager().containsServer(this.server);
 	}
 
+	public WorkItemDTO chooseWorkItemDialog() {
+		if (server == null) {
+			connect();
+		}
+		Shell parentShell = Display.getCurrent().getActiveShell();
+		WorkItemClient wiClient = server.getConnection().getWorkItemClient();
+		Project initialProject = wiClient.getProjects().getProjects()[0];
+		boolean allowMultiSelect = false;
+		WorkItemPickerDialog diag = new WorkItemPickerDialog(parentShell,
+				server,	wiClient, initialProject, null, allowMultiSelect);
+		
+		WorkItemDTO wiResult = null;
+		if (diag.open() == BaseDialog.OK) {
+			//Call to getWorkItem because the PickerDialg don't retrieves the revisions  
+			int wiID = diag.getSelectedWorkItems()[0].getID();
+			wiResult = getWorkItem(wiID);
+		}
+		return wiResult;
+	}
+	
 	@Override
 	public WorkItemDTO getWorkItem(long id) {
 		if (server == null) {
