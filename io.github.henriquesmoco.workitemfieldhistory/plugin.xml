@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
-   <extension
-         point="org.eclipse.ui.views">
+   <extension point="com.microsoft.tfs.client.common.ui.teamExplorerNavigationLink">
+      <teamExplorerNavigationLink
+            class="io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryNavLink"
+            displayPriority="100"
+            id="io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryNavLink"
+            parentID="com.microsoft.tfs.client.common.ui.teamexplorer.items.TeamExplorerWorkItemsNavigationItem"
+            title="Work Item Field History">
+      </teamExplorerNavigationLink>
+   </extension>
+   
+   <extension point="org.eclipse.ui.views">
       <view
             name="Work Item Field History"
             icon="icons/sample.gif"
@@ -11,5 +19,4 @@
             id="io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView">
       </view>
    </extension>
-
 </plugin>

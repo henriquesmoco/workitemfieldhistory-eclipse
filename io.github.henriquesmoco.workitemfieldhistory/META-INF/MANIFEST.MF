@@ -5,8 +5,6 @@ Bundle-SymbolicName: io.github.henriquesmoco.workitemfieldhistory;singleton:=tru
 Bundle-Version: 0.0.0.beta
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.jface.text,
- org.eclipse.ui.editors,
  com.microsoft.tfs.core,
  com.microsoft.tfs.client.common.ui,
  org.eclipse.nebula.widgets.grid;bundle-version="1.0.0",
