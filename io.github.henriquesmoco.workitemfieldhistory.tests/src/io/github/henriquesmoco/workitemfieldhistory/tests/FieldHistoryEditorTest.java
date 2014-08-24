@@ -1,28 +1,29 @@
 package io.github.henriquesmoco.workitemfieldhistory.tests;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import io.github.henriquesmoco.workitemfieldhistory.core.RevisionItem;
+import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
+import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
+import io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 
-import io.github.henriquesmoco.workitemfieldhistory.core.RevisionItem;
-import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
-import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
-import io.github.henriquesmoco.workitemfieldhistory.views.FieldHistoryView;
-
 import org.eclipse.nebula.widgets.grid.GridItem;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.verification.AtLeast;
 
 public class FieldHistoryEditorTest {
 	
