@@ -19,10 +19,12 @@ import org.eclipse.nebula.widgets.grid.Grid;
 import org.eclipse.nebula.widgets.grid.GridColumn;
 import org.eclipse.nebula.widgets.grid.GridItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -69,10 +71,12 @@ public class FieldHistoryView extends ViewPart {
 		btnShowRevisions.setText("Show Revision(s)");
 		btnShowRevisions.setEnabled(false);
 		btnShowRevisions.addListener(SWT.Selection, evt -> {
-			long id = Long.parseLong(txtWorkItemId.getText());
-			WorkItemDTO wi = tfsManager.getWorkItem(id);
-			updateView(wi);
-		});		
+			BusyIndicator.showWhile(Display.getDefault(), () -> {
+				long id = Long.parseLong(txtWorkItemId.getText());
+				WorkItemDTO wi = tfsManager.getWorkItem(id);
+				updateView(wi);
+			});
+		});
 	}
 	
 	private void createGroupWorkItemIn(Composite composite) {
