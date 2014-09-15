@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="io.github.henriquesmoco.workitemfieldhistory.feature"
+      label="Work Item Field History Feature"
+      version="1.0.0"
+      provider-name="Henrique Smoco"
+      license-feature="com.microsoft.tfs.client.eclipse.feature"
+      license-feature-version="12.0.1.201403041643">
+
+   <description url="http://www.example.com/description">
+      TFS Work Item Field History for Eclipse.
+Inspired by the work of ALM Ranger Vinicius Moura in the version
+for Visual Studio.
+To see the Visual Studio Plugin access http://visualstudiogallery.msdn.microsoft.com/68f29da6-36ef-4084-9973-1fbf6116db48
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      Coded by Henrique Smoco - 2014
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      Same as TFS Plugin
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="com.microsoft.tfs.core"/>
+      <import plugin="com.microsoft.tfs.client.common.ui"/>
+      <import plugin="org.eclipse.nebula.widgets.grid" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.microsoft.tfs.client.common"/>
+   </requires>
+
+   <plugin
+         id="io.github.henriquesmoco.workitemfieldhistory"
+         download-size="17"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
