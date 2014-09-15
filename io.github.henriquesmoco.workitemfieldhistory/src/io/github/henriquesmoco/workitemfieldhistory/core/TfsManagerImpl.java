@@ -1,5 +1,7 @@
 package io.github.henriquesmoco.workitemfieldhistory.core;
 
+import io.github.henriquesmoco.workitemfieldhistory.exception.TfsNotConnectedException;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -64,7 +66,7 @@ public class TfsManagerImpl implements TfsManager {
 				.getProductPlugin().getServerManager().getDefaultServer();
 		
 		if (server == null) {
-			throw new RuntimeException("Not connected to TFS");
+			throw new TfsNotConnectedException();
 		}
 		if (serverManagerListener == null) {
 			addServerManagerListener();

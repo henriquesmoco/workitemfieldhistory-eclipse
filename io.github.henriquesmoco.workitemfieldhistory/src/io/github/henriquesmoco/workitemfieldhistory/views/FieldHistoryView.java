@@ -5,6 +5,13 @@ import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
 import io.github.henriquesmoco.workitemfieldhistory.core.TfsManagerImpl;
 import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
 
+
+
+
+
+
+import io.github.henriquesmoco.workitemfieldhistory.exception.TfsNotConnectedException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,6 +22,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+
+
+
+
+
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.nebula.widgets.grid.Grid;
 import org.eclipse.nebula.widgets.grid.GridColumn;
 import org.eclipse.nebula.widgets.grid.GridItem;
@@ -29,7 +44,10 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.statushandlers.StatusManager;
 
+
+import com.microsoft.tfs.client.common.framework.status.TeamExplorerStatus;
 import com.microsoft.tfs.client.common.ui.framework.helper.SWTUtil;
 
 
@@ -75,8 +93,14 @@ public class FieldHistoryView extends ViewPart {
 		btnChooseWorkItem.setEnabled(true);
 		btnChooseWorkItem.addListener(SWT.Selection, evt -> {
 			BusyIndicator.showWhile(Display.getDefault(), () -> {
-				WorkItemDTO wi = tfsManager.chooseWorkItemDialog();
-				updateView(wi);
+				try {
+					WorkItemDTO wi = tfsManager.chooseWorkItemDialog();
+					updateView(wi);
+				} catch (TfsNotConnectedException ex) {
+					showModal(toErrorStatus(TfsNotConnectedException.ID, ex));
+				} catch (Exception ex) {
+					showModal(toErrorStatus(IStatus.ERROR, ex));
+				}
 			});
 		});
 	}
@@ -87,11 +111,29 @@ public class FieldHistoryView extends ViewPart {
 		btnShowRevisions.setEnabled(false);
 		btnShowRevisions.addListener(SWT.Selection, evt -> {
 			BusyIndicator.showWhile(Display.getDefault(), () -> {
-				long id = Long.parseLong(txtWorkItemId.getText());
-				WorkItemDTO wi = tfsManager.getWorkItem(id);
-				updateView(wi);
+				try {
+					long id = Long.parseLong(txtWorkItemId.getText());
+					WorkItemDTO wi = tfsManager.getWorkItem(id);
+					updateView(wi);
+				} catch (TfsNotConnectedException ex) {
+					showModal(toErrorStatus(TfsNotConnectedException.ID, ex));
+				} catch (Exception ex) {
+					showModal(toErrorStatus(IStatus.ERROR, ex));
+				}
 			});
 		});
+	}
+	
+	private IStatus toErrorStatus(int errorId, Exception ex) {
+		IStatus status = new TeamExplorerStatus(
+				Status.ERROR, 
+				FieldHistoryView.ID, errorId, 
+				ex.getMessage(), ex);
+		return status;
+	}
+	
+	private void showModal(IStatus status) {
+		StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK);
 	}
 	
 	private void createGroupWorkItemIn(Composite composite) {
