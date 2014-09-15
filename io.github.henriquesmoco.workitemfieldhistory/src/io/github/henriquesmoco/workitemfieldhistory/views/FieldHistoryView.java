@@ -4,12 +4,6 @@ import io.github.henriquesmoco.workitemfieldhistory.core.RevisionItem;
 import io.github.henriquesmoco.workitemfieldhistory.core.TfsManager;
 import io.github.henriquesmoco.workitemfieldhistory.core.TfsManagerImpl;
 import io.github.henriquesmoco.workitemfieldhistory.core.WorkItemDTO;
-
-
-
-
-
-
 import io.github.henriquesmoco.workitemfieldhistory.exception.TfsNotConnectedException;
 
 import java.util.ArrayList;
@@ -21,12 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-
-
-
-
-
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,7 +33,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.statushandlers.StatusManager;
-
 
 import com.microsoft.tfs.client.common.framework.status.TeamExplorerStatus;
 import com.microsoft.tfs.client.common.ui.framework.helper.SWTUtil;
@@ -92,15 +79,9 @@ public class FieldHistoryView extends ViewPart {
 		btnChooseWorkItem.setToolTipText("Choose Work Item...");
 		btnChooseWorkItem.setEnabled(true);
 		btnChooseWorkItem.addListener(SWT.Selection, evt -> {
-			BusyIndicator.showWhile(Display.getDefault(), () -> {
-				try {
-					WorkItemDTO wi = tfsManager.chooseWorkItemDialog();
-					updateView(wi);
-				} catch (TfsNotConnectedException ex) {
-					showModal(toErrorStatus(TfsNotConnectedException.ID, ex));
-				} catch (Exception ex) {
-					showModal(toErrorStatus(IStatus.ERROR, ex));
-				}
+			execute(() -> {
+				WorkItemDTO wi = tfsManager.chooseWorkItemDialog();
+				updateView(wi);
 			});
 		});
 	}
@@ -110,17 +91,24 @@ public class FieldHistoryView extends ViewPart {
 		btnShowRevisions.setText("Show Revision(s)");
 		btnShowRevisions.setEnabled(false);
 		btnShowRevisions.addListener(SWT.Selection, evt -> {
-			BusyIndicator.showWhile(Display.getDefault(), () -> {
-				try {
-					long id = Long.parseLong(txtWorkItemId.getText());
-					WorkItemDTO wi = tfsManager.getWorkItem(id);
-					updateView(wi);
-				} catch (TfsNotConnectedException ex) {
-					showModal(toErrorStatus(TfsNotConnectedException.ID, ex));
-				} catch (Exception ex) {
-					showModal(toErrorStatus(IStatus.ERROR, ex));
-				}
+			execute(() -> {
+				long id = Long.parseLong(txtWorkItemId.getText());
+				WorkItemDTO wi = tfsManager.getWorkItem(id);
+				updateView(wi);
 			});
+		});
+	}
+	
+	//TODO Later verify loading work items with Eclipse Job (https://www.eclipse.org/articles/Article-Concurrency/jobs-api.html)
+	private void execute(Runnable task) {
+		BusyIndicator.showWhile(Display.getDefault(), () -> {
+			try {
+				task.run();
+			} catch (TfsNotConnectedException ex) {
+				showModal(toErrorStatus(TfsNotConnectedException.ID, ex));
+			} catch (Exception ex) {
+				showModal(toErrorStatus(IStatus.ERROR, ex));
+			}
 		});
 	}
 	
