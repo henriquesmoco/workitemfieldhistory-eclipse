@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="io.github.henriquesmoco.workitemfieldhistory.feature"
-      label="Work Item Field History Feature"
-      version="1.0.0"
+      label="Work Item Field History"
+      version="0.8.0"
       provider-name="Henrique Smoco"
       license-feature="com.microsoft.tfs.client.eclipse.feature"
       license-feature-version="12.0.1.201403041643">
